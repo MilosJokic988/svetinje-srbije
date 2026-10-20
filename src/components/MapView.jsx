@@ -4,6 +4,8 @@ import L from 'leaflet'
 import { MONASTERIES, REGIONS } from '../data/monasteries'
 import SerbiaOutline from './SerbiaOutline'
 
+const DEFAULT_CENTER = [44.0, 20.9]
+
 const BOUNDS = [
   [39.8, 17.6],
   [47.2, 24.2],
@@ -38,7 +40,10 @@ function KeepSized() {
   const map = useMap()
   useEffect(() => {
     const el = map.getContainer()
-    const fix = () => map.invalidateSize({ pan: false })
+    const fix = () => {
+      map.invalidateSize({ pan: false })
+      resetIfBroken(map)
+    }
     const ro = new ResizeObserver(fix)
     ro.observe(el)
     const timers = [100, 400, 1000].map((t) => setTimeout(fix, t))
@@ -57,26 +62,69 @@ function KeepSized() {
   return null
 }
 
+// Centriranje na Srbiju tek kad mapa dobije pravu veličinu.
+// Na telefonu je pri prvom učitavanju prostor za mapu ponekad visok 0 piksela, a centriranje
+// u tom trenutku daje nemoguć položaj i mapa ostaje prazna dok se stranica ne osveži.
 function InitialFit() {
   const map = useMap()
   useEffect(() => {
+    const el = map.getContainer()
+    const bounds = L.latLngBounds(MONASTERIES.map((p) => [p.lat, p.lng]))
+    let done = false
+
     const fit = () => {
+      if (done) return
+      const w = el.clientWidth
+      const h = el.clientHeight
+      if (w < 100 || h < 200) return // još nema pravu veličinu, čekamo
       map.invalidateSize({ pan: false })
-      map.fitBounds(L.latLngBounds(MONASTERIES.map((p) => [p.lat, p.lng])), {
-        paddingTopLeft: [24, isMobile() ? 80 : 40],
-        paddingBottomRight: [24, sheetPad()],
-        animate: false,
-      })
+      const mobile = window.innerWidth < 900
+      const top = mobile ? Math.min(80, h * 0.1) : 40
+      const bottom = mobile ? Math.min(window.innerHeight * 0.45 + 16, h * 0.6) : 40
+      map.fitBounds(bounds, { paddingTopLeft: [24, top], paddingBottomRight: [24, bottom], animate: false })
+      resetIfBroken(map)
+      done = true
+      ro.disconnect()
     }
-    map.whenReady(() => requestAnimationFrame(fit))
+
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    fit()
+    // Sigurnosna mreža: ako veličina ni posle 2,5 s nije stigla, prikaži Srbiju podrazumevano
+    const timer = setTimeout(() => {
+      if (done) return
+      done = true
+      ro.disconnect()
+      map.invalidateSize({ pan: false })
+      map.setView(DEFAULT_CENTER, 7, { animate: false })
+    }, 2500)
+
+    return () => {
+      ro.disconnect()
+      clearTimeout(timer)
+    }
   }, [map])
   return null
+}
+
+// Ako je mapa ipak dobila nemoguć položaj, vrati je na Srbiju
+function resetIfBroken(map) {
+  let broken = false
+  try {
+    const c = map.getCenter()
+    broken = !Number.isFinite(c.lat) || !Number.isFinite(c.lng) || !Number.isFinite(map.getZoom())
+  } catch {
+    broken = true // Leaflet baca grešku kad je položaj nemoguć
+  }
+  if (broken) map.setView(DEFAULT_CENTER, 7, { animate: false })
 }
 
 function FlyTo({ target }) {
   const map = useMap()
   useEffect(() => {
     if (!target) return
+    const el = map.getContainer()
+    if (el.clientWidth < 100 || el.clientHeight < 200) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const zoom = Math.max(map.getZoom(), 10)
     const point = map.project([target.lat, target.lng], zoom)
