@@ -79,6 +79,12 @@ export default function PlaceDetail({ place, visited, distance, onToggleVisited,
             <dt>{t(place.kind === 'crkva' ? 'Ktitor crkve' : 'Ktitor')}</dt>
             <dd>{t(place.founder)}</dd>
           </div>
+          {place.saints && (
+            <div>
+              <dt>{t('Ovde počiva')}</dt>
+              <dd>{t(place.saints.split(',')[0])}</dd>
+            </div>
+          )}
           <div>
             <dt>{t('Kako stići')}</dt>
             <dd>{t(place.howTo)}</dd>

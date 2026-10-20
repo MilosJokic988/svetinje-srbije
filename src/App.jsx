@@ -67,7 +67,7 @@ export default function App() {
     return MONASTERIES.filter(
       (p) =>
         (region === 'sve' || p.region === region) &&
-        (!q || normalize(`${p.name} ${p.place} ${p.founder}`).includes(q))
+        (!q || normalize(`${p.name} ${p.place} ${p.founder} ${p.saints || ''}`).includes(q))
     )
   }, [region, query])
 
@@ -219,7 +219,7 @@ export default function App() {
                     <span className="sr-only">{t('Pretraži svetinje')}</span>
                     <input
                       type="search"
-                      placeholder={t('Manastir, mesto ili ktitor')}
+                      placeholder={t('Manastir, mesto ili svetitelj')}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                     />
