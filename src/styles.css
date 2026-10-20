@@ -885,6 +885,53 @@ button {
   stroke-width: 4;
 }
 
+/* ───────── Imena gradova na mapi ───────── */
+.city {
+  position: relative;
+  pointer-events: none;
+}
+
+.city i {
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3a2c14;
+  box-shadow: 0 0 0 1.5px #f3ead6;
+}
+
+.city span {
+  position: absolute;
+  left: 7px;
+  top: -9px;
+  white-space: nowrap;
+  font-family: var(--body);
+  font-size: 12px;
+  font-weight: 600;
+  color: #3a2c14;
+  text-shadow: 0 0 3px #f3ead6, 0 0 3px #f3ead6, 0 0 6px #f3ead6;
+}
+
+.city--1 span {
+  font-size: 15px;
+  font-weight: 700;
+  top: -11px;
+}
+
+.city--1 i {
+  width: 8px;
+  height: 8px;
+  left: -4px;
+  top: -4px;
+}
+
+.city--3 span {
+  font-size: 11px;
+  font-weight: 500;
+}
+
 /* ───────── Animacije ───────── */
 @keyframes rise {
   from {

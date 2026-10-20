@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, CircleMarker, useMap, useMapEvents } f
 import L from 'leaflet'
 import { MONASTERIES, REGIONS } from '../data/monasteries'
 import SerbiaOutline from './SerbiaOutline'
+import CityLabels from './CityLabels'
 
 const DEFAULT_CENTER = [44.0, 20.9]
 
@@ -163,14 +164,17 @@ export default function MapView({ places, visited, selectedId, onSelect, userPos
       zoomControl={false}
       className="map"
     >
+      {/* Reljefna podloga bez natpisa i bez granica. Imena gradova ispisujemo sami, na srpskom. */}
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-        maxZoom={19}
+        attribution='Reljef &copy; <a href="https://www.esri.com">Esri</a>'
+        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}"
+        maxNativeZoom={13}
+        maxZoom={15}
         keepBuffer={4}
       />
 
       <SerbiaOutline />
+      <CityLabels />
 
       {places.map((p) => (
         <Marker
