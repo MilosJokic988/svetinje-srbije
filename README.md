@@ -25,3 +25,7 @@ Sve je u `src/data/monasteries.js`. Tekst se piše latinicom, a ćirilica se pra
 ## Objavljivanje
 
 Isto kao Skrivena Srbija: GitHub, pa Vercel. Ime projekta na Vercelu: `svetinje-srbije`.
+
+## Mapa
+
+Podloga mape je OpenFreeMap (podaci OpenStreetMap). Besplatna je, bez ključa i bez ograničenja, i dozvoljena za komercijalnu upotrebu. Svi nazivi gradova, sela i reka ispisuju se na srpskom, a državne granice iz podloge su sakrivene, pa se vidi samo granica Srbije sa Kosovom i Metohijom. Podešavanja su u `src/components/VectorBase.jsx`.

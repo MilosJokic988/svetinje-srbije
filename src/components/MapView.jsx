@@ -1,9 +1,10 @@
-import { useEffect, useMemo } from 'react'
-import { MapContainer, TileLayer, Marker, CircleMarker, useMap, useMapEvents } from 'react-leaflet'
+import { useContext, useEffect, useMemo } from 'react'
+import { ScriptContext } from '../i18n'
+import { MapContainer, Marker, CircleMarker, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import { MONASTERIES, REGIONS } from '../data/monasteries'
 import SerbiaOutline from './SerbiaOutline'
-import CityLabels from './CityLabels'
+import VectorBase from './VectorBase'
 
 const DEFAULT_CENTER = [44.0, 20.9]
 
@@ -151,6 +152,7 @@ function MapTouch({ onTouch }) {
 }
 
 export default function MapView({ places, visited, selectedId, onSelect, userPosition, onMapTouch }) {
+  const script = useContext(ScriptContext)
   const selected = useMemo(() => places.find((p) => p.id === selectedId), [places, selectedId])
 
   return (
@@ -161,20 +163,13 @@ export default function MapView({ places, visited, selectedId, onSelect, userPos
       zoomSnap={0.25}
       maxBounds={BOUNDS}
       maxBoundsViscosity={0.8}
+      maxZoom={18}
       zoomControl={false}
       className="map"
     >
-      {/* Reljefna podloga bez natpisa i bez granica. Imena gradova ispisujemo sami, na srpskom. */}
-      <TileLayer
-        attribution='Reljef &copy; <a href="https://www.esri.com">Esri</a>'
-        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}"
-        maxNativeZoom={13}
-        maxZoom={15}
-        keepBuffer={4}
-      />
+      <VectorBase script={script} />
 
       <SerbiaOutline />
-      <CityLabels />
 
       {places.map((p) => (
         <Marker
